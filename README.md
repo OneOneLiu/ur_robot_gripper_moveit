@@ -5,3 +5,4 @@
 - [ ] Add planning scene
 - [ ] Fix gripper joint limits issues
 - [ ] Add buckle of the gripper for better visualization
+- [ ] Fix random loading pose errors
