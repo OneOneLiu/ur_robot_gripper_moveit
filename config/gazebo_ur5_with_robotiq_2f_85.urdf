@@ -119,6 +119,29 @@
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </actuator>
     </transmission>
+    <!-- add base frame link -->
+    <link name="frame">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/frame/visual/frame.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/frame/collision/frame.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
     <!-- links: main serial chain -->
     <link name="base_link" />
     <link name="base_link_inertia">
@@ -634,10 +657,9 @@
             <offset>0.0</offset>
         </plugin>
     </gazebo>
-    <link name="world"/>
     <joint name="virtual_base" type="fixed">
-        <parent link="world"/>
+        <parent link="frame"/>
         <child link="base_link"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0.87" rpy="0 0 1.57"/>
     </joint>
 </robot>
