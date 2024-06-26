@@ -120,75 +120,6 @@
         </actuator>
     </transmission>
     <link name="world"/>
-    <!-- add base frame link -->
-    <link name="frame">
-        <visual>
-            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
-            <geometry>
-                <mesh filename="package://ur5_gripper_moveit/meshes/frame/visual/frame.dae" />
-            </geometry>
-            <material name="LightGrey">
-                <color rgba="0.7 0.7 0.7 1.0" />
-            </material>
-        </visual>
-        <collision>
-            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
-            <geometry>
-                <mesh filename="package://ur5_gripper_moveit/meshes/frame/collision/frame.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <mass value="40.0" />
-            <origin rpy="0 0 0" xyz="0 0 0" />
-            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
-        </inertial>
-    </link>
-    <!-- add base scanner link -->
-    <link name="scanner">
-        <visual>
-            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
-            <geometry>
-                <mesh filename="package://ur5_gripper_moveit/meshes/scanner/visual/scanner.dae" />
-            </geometry>
-            <material name="LightGrey">
-                <color rgba="0.7 0.7 0.7 1.0" />
-            </material>
-        </visual>
-        <collision>
-            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
-            <geometry>
-                <mesh filename="package://ur5_gripper_moveit/meshes/scanner/collision/scanner.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <mass value="40.0" />
-            <origin rpy="0 0 0" xyz="0 0 0" />
-            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
-        </inertial>
-    </link>
-    <!-- add realsense -->
-    <link name="realsense">
-        <visual>
-            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
-            <geometry>
-                <mesh filename="package://ur5_gripper_moveit/meshes/realsense/visual/realsense.dae" />
-            </geometry>
-            <material name="LightGrey">
-                <color rgba="0.7 0.7 0.7 1.0" />
-            </material>
-        </visual>
-        <collision>
-            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
-            <geometry>
-                <mesh filename="package://ur5_gripper_moveit/meshes/realsense/collision/realsense.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <mass value="40.0" />
-            <origin rpy="0 0 0" xyz="0 0 0" />
-            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
-        </inertial>
-    </link>
     <!-- links: main serial chain -->
     <link name="base_link" />
     <link name="base_link_inertia">
@@ -704,24 +635,93 @@
             <offset>0.0</offset>
         </plugin>
     </gazebo>
+     <!-- add base frame link -->
+    <link name="frame">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/frame/visual/frame.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/frame/collision/frame.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
+    <!-- add base scanner link -->
+    <link name="scanner">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/scanner/visual/scanner.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/scanner/collision/scanner.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
+    <!-- add realsense -->
+    <link name="realsense">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/realsense/visual/realsense.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/realsense/collision/realsense.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.4" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
     <joint name="virtual_base" type="fixed">
         <parent link="world"/>
         <child link="frame"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0.857" rpy="0 0 0"/>
     </joint>
     <joint name="frame_base" type="fixed">
         <parent link="frame"/>
         <child link="base_link"/>
-        <origin xyz="0 0 0.87" rpy="0 0 1.57"/>
+        <origin xyz="0 0 0" rpy="0 0 1.57"/>
     </joint>
     <joint name="scanner_frame" type="fixed">
         <parent link="frame"/>
         <child link="scanner"/>
-        <origin xyz="0 1.53 1.681" rpy="-1.57 0 3.14"/>
+        <origin xyz="-0.025 0.67 0.817" rpy="-1.57 0 3.14"/>
     </joint>
     <joint name="tool_realsense" type="fixed">
         <parent link="tool0"/>
         <child link="realsense"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="1.57 0 -1.57 "/>
     </joint>
 </robot>
