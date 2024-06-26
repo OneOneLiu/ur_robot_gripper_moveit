@@ -143,6 +143,29 @@
             <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
         </inertial>
     </link>
+    <!-- add base scanner link -->
+    <link name="scanner">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/scanner/visual/scanner.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0.857" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/scanner/collision/scanner.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
     <!-- links: main serial chain -->
     <link name="base_link" />
     <link name="base_link_inertia">
@@ -667,5 +690,10 @@
         <parent link="frame"/>
         <child link="base_link"/>
         <origin xyz="0 0 0.87" rpy="0 0 1.57"/>
+    </joint>
+    <joint name="scanner_frame" type="fixed">
+        <parent link="frame"/>
+        <child link="scanner"/>
+        <origin xyz="0 1.53 1.681" rpy="-1.57 0 3.14"/>
     </joint>
 </robot>
