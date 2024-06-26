@@ -119,6 +119,7 @@
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </actuator>
     </transmission>
+    <link name="world"/>
     <!-- add base frame link -->
     <link name="frame">
         <visual>
@@ -658,6 +659,11 @@
         </plugin>
     </gazebo>
     <joint name="virtual_base" type="fixed">
+        <parent link="world"/>
+        <child link="frame"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+    <joint name="frame_base" type="fixed">
         <parent link="frame"/>
         <child link="base_link"/>
         <origin xyz="0 0 0.87" rpy="0 0 1.57"/>
