@@ -366,7 +366,7 @@
     <joint name="robotiq_85_base_joint" type="fixed">
         <parent link="tool0" />
         <child link="robotiq_85_base_link" />
-        <origin rpy="0 -1.5707963267948966 3.141592653589793" xyz="0 0 0.004" />
+        <origin rpy="0 -1.5707963267948966 1.5707963267948966" xyz="0 0 0.004" />
     </joint>
     <link name="robotiq_85_base_link">
         <visual>
@@ -712,16 +712,17 @@
     <joint name="frame_base" type="fixed">
         <parent link="frame"/>
         <child link="base_link"/>
-        <origin xyz="0 0 0" rpy="0 0 1.57"/>
+        <origin xyz="0 0 0.01" rpy="0 0 1.57"/>
     </joint>
     <joint name="scanner_frame" type="fixed">
         <parent link="frame"/>
         <child link="scanner"/>
-        <origin xyz="-0.025 0.67 0.817" rpy="-1.57 0 3.14"/>
+        <!-- <origin xyz="-0.025 0.67 0.817" rpy="-1.57 0 3.14"/> -->
+        <origin xyz="-0.025 0.66 0.775" rpy="-1.57 0 3.14"/>
     </joint>
     <joint name="tool_realsense" type="fixed">
         <parent link="tool0"/>
         <child link="realsense"/>
-        <origin xyz="0 0 0" rpy="1.57 0 -1.57 "/>
+        <origin xyz="0 0 0" rpy="1.57 0 3.14 "/>
     </joint>
 </robot>
