@@ -681,6 +681,29 @@
             <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
         </inertial>
     </link>
+    <!-- add base scanner link -->
+    <link name="tray">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/tray/visual/grasping_tray.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_gripper_moveit/meshes/tray/collision/grasping_tray.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
     <!-- add realsense -->
     <link name="realsense">
         <visual>
@@ -724,5 +747,10 @@
         <parent link="tool0"/>
         <child link="realsense"/>
         <origin xyz="0 0 0" rpy="1.57 0 3.14 "/>
+    </joint>
+    <joint name="frame_tray" type="fixed">
+        <parent link="frame"/>
+        <child link="tray"/>
+        <origin xyz="0.015 0.54 0" rpy="0 0 1.57 "/>
     </joint>
 </robot>
