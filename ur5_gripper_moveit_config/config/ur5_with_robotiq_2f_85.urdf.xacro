@@ -8,7 +8,95 @@
     <!-- Import control_xacro -->
     <xacro:include filename="ur5_with_robotiq_2f_85.ros2_control.xacro" />
 
-
     <xacro:ur5_with_robotiq_2f_85_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+
+    <link name="frame">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_robot_gripper/meshes/frame/visual/frame.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_robot_gripper/meshes/frame/collision/frame.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
+
+    <!-- add realsense -->
+    <link name="realsense">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_robot_gripper/meshes/realsense/visual/realsense.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_robot_gripper/meshes/realsense/collision/realsense.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.4" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
+
+    <!-- add tray link -->
+    <link name="tray">
+        <visual>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_robot_gripper/meshes/tray/visual/grasping_tray.dae" />
+            </geometry>
+            <material name="LightGrey">
+                <color rgba="0.7 0.7 0.7 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
+            <geometry>
+                <mesh filename="package://ur5_robot_gripper/meshes/tray/collision/grasping_tray.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="40.0" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072" />
+        </inertial>
+    </link>
+    <!-- 这个是frame在base下了， 跟ros1的版本不一样，后面ros1的要改成这个，这样base作为fix，很合理 -->
+    <joint name="base_frame" type="fixed">
+        <parent link="base_link"/>
+        <child link="frame"/>
+        <origin xyz="0 0 -0.01" rpy="0 0 3.14"/>
+    </joint>
+
+    <joint name="tool_realsense" type="fixed">
+        <parent link="tool0"/>
+        <child link="realsense"/>
+        <origin xyz="0 0 0" rpy="1.57 0 3.1415 "/>
+    </joint>
+
+    <joint name="frame_tray" type="fixed">
+        <parent link="frame"/>
+        <child link="tray"/>
+        <origin xyz="0.015 0.54 0" rpy="0 0 1.57 "/>
+    </joint>
 
 </robot>
