@@ -6,8 +6,8 @@ moveit_setup_assistant_config:
     relative_path: config/ur5_with_robotiq_2f_85.srdf
   package_settings:
     author_name: Daohui Liu
-    author_email: daohuiliu@qq.com
-    generated_timestamp: 1724115002
+    author_email: daohui.liu@qq.com
+    generated_timestamp: 1724368751
   control_xacro:
     command:
       - position

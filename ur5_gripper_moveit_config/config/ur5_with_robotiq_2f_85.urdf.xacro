@@ -8,8 +8,15 @@
     <!-- Import control_xacro -->
     <xacro:include filename="ur5_with_robotiq_2f_85.ros2_control.xacro" />
 
+
     <xacro:ur5_with_robotiq_2f_85_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
 
+    <link name="finger_center"/>
+    <joint name="finger_center_joint" type="fixed">
+        <origin xyz="0 0 0.16" rpy="0 0 0"/>
+        <parent link="tool0"/>
+        <child link="finger_center"/>
+    </joint>
     <link name="frame">
         <visual>
             <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
@@ -88,7 +95,7 @@
     </joint>
 
     <joint name="tool_realsense" type="fixed">
-        <parent link="tool0"/>
+        <parent link="wrist_3_link"/>
         <child link="realsense"/>
         <origin xyz="0 0 0" rpy="1.57 0 3.1415 "/>
     </joint>
@@ -98,5 +105,4 @@
         <child link="tray"/>
         <origin xyz="0.015 0.54 0" rpy="0 0 1.57 "/>
     </joint>
-
 </robot>
