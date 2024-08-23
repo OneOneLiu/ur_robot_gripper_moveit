@@ -11,12 +11,6 @@
 
     <xacro:ur5_with_robotiq_2f_85_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
 
-    <link name="finger_center"/>
-    <joint name="finger_center_joint" type="fixed">
-        <origin xyz="0 0 0.16" rpy="0 0 0"/>
-        <parent link="tool0"/>
-        <child link="finger_center"/>
-    </joint>
     <link name="frame">
         <visual>
             <origin rpy="0 0 3.141592653589793" xyz="0 0 0" />
