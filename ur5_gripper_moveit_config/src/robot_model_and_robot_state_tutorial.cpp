@@ -81,7 +81,7 @@ int main(int argc, char** argv)
   // which represents the robot model for a particular group, e.g. the "panda_arm" of the Panda robot.
   moveit::core::RobotStatePtr robot_state(new moveit::core::RobotState(kinematic_model));
   robot_state->setToDefaultValues();
-  const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("panda_arm");
+  const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("manipulator");
 
   const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
   // "panda_link8" which is the most distal link in the
   // "panda_arm" group of the robot.
   robot_state->setToRandomPositions(joint_model_group);
-  const Eigen::Isometry3d& end_effector_state = robot_state->getGlobalLinkTransform("panda_link8");
+  const Eigen::Isometry3d& end_effector_state = robot_state->getGlobalLinkTransform("tool0");
 
   /* Print end-effector pose. Remember that this is in the model frame */
   RCLCPP_INFO_STREAM(LOGGER, "Translation: \n" << end_effector_state.translation() << "\n");
