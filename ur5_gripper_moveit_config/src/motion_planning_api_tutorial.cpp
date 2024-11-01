@@ -88,19 +88,19 @@ int main(int argc, char** argv)
   planning_scene::PlanningScenePtr planning_scene(new planning_scene::PlanningScene(robot_model));
 
   // Configure a valid robot state
-  planning_scene->getCurrentStateNonConst().setToDefaultValues(joint_model_group, "ready");
+  planning_scene->getCurrentStateNonConst().setToDefaultValues(joint_model_group, "home");
 
   // We will now construct a loader to load a planner, by name.
   // Note that we are using the ROS pluginlib library here.
   std::unique_ptr<pluginlib::ClassLoader<planning_interface::PlannerManager>> planner_plugin_loader;
   planning_interface::PlannerManagerPtr planner_instance;
-  std::vector<std::string> planner_plugin_names;
+  std::string planner_plugin_name;
 
   // We will get the name of planning plugin we want to load
   // from the ROS parameter server, and then load the planner
   // making sure to catch all exceptions.
-  if (!motion_planning_api_tutorial_node->get_parameter("ompl.planning_plugins", planner_plugin_names))
-    RCLCPP_FATAL(LOGGER, "Could not find planner plugin names");
+  if (!motion_planning_api_tutorial_node->get_parameter("planning_plugin", planner_plugin_name))
+    RCLCPP_FATAL(LOGGER, "Could not find planner plugin name");
   try
   {
     planner_plugin_loader.reset(new pluginlib::ClassLoader<planning_interface::PlannerManager>(
@@ -110,18 +110,9 @@ int main(int argc, char** argv)
   {
     RCLCPP_FATAL(LOGGER, "Exception while creating planning plugin loader %s", ex.what());
   }
-
-  if (planner_plugin_names.empty())
-  {
-    RCLCPP_ERROR(LOGGER,
-                 "No planner plugins defined. Please make sure that the planning_plugins parameter is not empty.");
-    return -1;
-  }
-
-  const auto& planner_name = planner_plugin_names.at(0);
   try
   {
-    planner_instance.reset(planner_plugin_loader->createUnmanagedInstance(planner_name));
+    planner_instance.reset(planner_plugin_loader->createUnmanagedInstance(planner_plugin_name));
     if (!planner_instance->initialize(robot_model, motion_planning_api_tutorial_node,
                                       motion_planning_api_tutorial_node->get_namespace()))
       RCLCPP_FATAL(LOGGER, "Could not initialize planner instance");
@@ -133,7 +124,7 @@ int main(int argc, char** argv)
     std::stringstream ss;
     for (const auto& cls : classes)
       ss << cls << " ";
-    RCLCPP_ERROR(LOGGER, "Exception while loading planner '%s': %s\nAvailable plugins: %s", planner_name.c_str(),
+    RCLCPP_ERROR(LOGGER, "Exception while loading planner '%s': %s\nAvailable plugins: %s", planner_plugin_name.c_str(),
                  ex.what(), ss.str().c_str());
   }
 
@@ -194,28 +185,16 @@ int main(int argc, char** argv)
   req.group_name = PLANNING_GROUP;
   req.goal_constraints.push_back(pose_goal);
 
-  // Define workspace bounds
-  req.workspace_parameters.min_corner.x = req.workspace_parameters.min_corner.y =
-      req.workspace_parameters.min_corner.z = -5.0;
-  req.workspace_parameters.max_corner.x = req.workspace_parameters.max_corner.y =
-      req.workspace_parameters.max_corner.z = 5.0;
-
   // We now construct a planning context that encapsulate the scene,
   // the request and the response. We call the planner using this
   // planning context
   planning_interface::PlanningContextPtr context =
       planner_instance->getPlanningContext(planning_scene, req, res.error_code_);
-
-  if (!context)
-  {
-    RCLCPP_ERROR(LOGGER, "Failed to create planning context");
-    return -1;
-  }
   context->solve(res);
   if (res.error_code_.val != res.error_code_.SUCCESS)
   {
     RCLCPP_ERROR(LOGGER, "Could not compute plan successfully");
-    return -1;
+    return 0;
   }
 
   // Visualize the result
@@ -251,7 +230,7 @@ int main(int argc, char** argv)
   // ^^^^^^^^^^^^^^^^^
   // Now, setup a joint space goal
   moveit::core::RobotState goal_state(robot_model);
-  std::vector<double> joint_values = { -1.0, 0.7, 0.7, -1.5, -0.7, 2.0 };
+  std::vector<double> joint_values = { -1.57, -1.57, 1.57, -1.57, -1.57, 0.0};
   goal_state.setJointGroupPositions(joint_model_group, joint_values);
   moveit_msgs::msg::Constraints joint_goal =
       kinematic_constraints::constructGoalConstraints(goal_state, joint_model_group);
@@ -267,7 +246,7 @@ int main(int argc, char** argv)
   if (res.error_code_.val != res.error_code_.SUCCESS)
   {
     RCLCPP_ERROR(LOGGER, "Could not compute plan successfully");
-    return -1;
+    return 0;
   }
   /* Visualize the trajectory */
   res.getMessage(response);

@@ -23,7 +23,7 @@ def generate_launch_description():
 
     # RViz
     rviz_config_file = (
-        get_package_share_directory("moveit2_tutorials") + "/launch/move_group.rviz"
+        get_package_share_directory("ur5_gripper_moveit_config") + "/launch/moveit_rviz.rviz"
     )
     rviz_node = Node(
         package="rviz2",
