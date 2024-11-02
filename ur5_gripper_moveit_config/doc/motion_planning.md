@@ -12,3 +12,6 @@
 我需要搞清楚这是为什么。
 
 现在已经问了一个问题：https://robotics.stackexchange.com/questions/113562/issues-with-motion-planning-path-on-ur-robot-using-moveit-api-tutorial
+
+有一个人回答说让我做插值，但是效果仍然不行，做了插值，每个姿态之间的距离差异很小了，还是会绕远路。
+
