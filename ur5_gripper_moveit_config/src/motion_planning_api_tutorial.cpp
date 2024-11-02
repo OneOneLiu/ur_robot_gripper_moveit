@@ -46,7 +46,52 @@
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 
+#include <vector>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("motion_planning_api_tutorial");
+
+// 插值函数，用于生成位置和姿态的中间目标点
+std::vector<geometry_msgs::msg::PoseStamped> interpolatePose(
+    const geometry_msgs::msg::PoseStamped &start_pose,
+    const geometry_msgs::msg::PoseStamped &end_pose, int steps)
+{
+    std::vector<geometry_msgs::msg::PoseStamped> interpolated_poses;
+
+    Eigen::Vector3d start_pos(start_pose.pose.position.x, start_pose.pose.position.y, start_pose.pose.position.z);
+    Eigen::Vector3d end_pos(end_pose.pose.position.x, end_pose.pose.position.y, end_pose.pose.position.z);
+    Eigen::Quaterniond start_quat(start_pose.pose.orientation.w, start_pose.pose.orientation.x,
+                                  start_pose.pose.orientation.y, start_pose.pose.orientation.z);
+    Eigen::Quaterniond end_quat(end_pose.pose.orientation.w, end_pose.pose.orientation.x,
+                                end_pose.pose.orientation.y, end_pose.pose.orientation.z);
+
+    for (int i = 0; i <= steps; ++i)
+    {
+        double t = static_cast<double>(i) / steps;
+
+        // 位置线性插值
+        Eigen::Vector3d interp_pos = start_pos + t * (end_pos - start_pos);
+
+        // 姿态SLERP插值
+        Eigen::Quaterniond interp_quat = start_quat.slerp(t, end_quat);
+
+        // 创建插值后的目标位姿
+        geometry_msgs::msg::PoseStamped interp_pose;
+        interp_pose.header.frame_id = start_pose.header.frame_id;
+        interp_pose.pose.position.x = interp_pos.x();
+        interp_pose.pose.position.y = interp_pos.y();
+        interp_pose.pose.position.z = interp_pos.z();
+        interp_pose.pose.orientation.w = interp_quat.w();
+        interp_pose.pose.orientation.x = interp_quat.x();
+        interp_pose.pose.orientation.y = interp_quat.y();
+        interp_pose.pose.orientation.z = interp_quat.z();
+
+        interpolated_poses.push_back(interp_pose);
+    }
+
+    return interpolated_poses;
+}
 
 int main(int argc, char** argv)
 {
@@ -68,10 +113,10 @@ int main(int argc, char** argv)
   // interface to load any planner that you want to use. Before we can
   // load the planner, we need two objects, a RobotModel and a
   // PlanningScene. We will start by instantiating a
-  // :moveit_codedir:`RobotModelLoader<moveit_ros/planning/robot_model_loader/include/moveit/robot_model_loader/robot_model_loader.h>`
+  // :moveit_codedir:RobotModelLoader<moveit_ros/planning/robot_model_loader/include/moveit/robot_model_loader/robot_model_loader.h>
   // object, which will look up the robot description on the ROS
   // parameter server and construct a
-  // :moveit_codedir:`RobotModel<moveit_core/robot_model/include/moveit/robot_model/robot_model.h>`
+  // :moveit_codedir:RobotModel<moveit_core/robot_model/include/moveit/robot_model/robot_model.h>
   // for us to use.
   const std::string PLANNING_GROUP = "manipulator";
   robot_model_loader::RobotModelLoader robot_model_loader(motion_planning_api_tutorial_node, "robot_description");
@@ -81,9 +126,9 @@ int main(int argc, char** argv)
   const moveit::core::JointModelGroup* joint_model_group = robot_state->getJointModelGroup(PLANNING_GROUP);
 
   // Using the
-  // :moveit_codedir:`RobotModel<moveit_core/robot_model/include/moveit/robot_model/robot_model.h>`,
+  // :moveit_codedir:RobotModel<moveit_core/robot_model/include/moveit/robot_model/robot_model.h>,
   // we can construct a
-  // :moveit_codedir:`PlanningScene<moveit_core/planning_scene/include/moveit/planning_scene/planning_scene.h>`
+  // :moveit_codedir:PlanningScene<moveit_core/planning_scene/include/moveit/planning_scene/planning_scene.h>
   // that maintains the state of the world (including the robot).
   planning_scene::PlanningScenePtr planning_scene(new planning_scene::PlanningScene(robot_model));
 
@@ -170,14 +215,95 @@ int main(int argc, char** argv)
   pose.pose.position.z = 0.75;
   pose.pose.orientation.w = 1.0;
 
+
   // A tolerance of 0.01 m is specified in position
   // and 0.01 radians in orientation
-  std::vector<double> tolerance_pose(3, 0.01);
-  std::vector<double> tolerance_angle(3, 0.01);
+  std::vector<double> tolerance_pose(3, 0.1);
+  std::vector<double> tolerance_angle(3, 0.1);
+  std::shared_ptr<rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>> display_publisher =
+      motion_planning_api_tutorial_node->create_publisher<moveit_msgs::msg::DisplayTrajectory>("/display_planned_path",
+                                                                                               1);
+  moveit_msgs::msg::DisplayTrajectory display_trajectory;
+
+
+  // 获取机器人当前的位姿，作为起始位姿 start_pose
+  geometry_msgs::msg::PoseStamped start_pose = move_group.getCurrentPose();
+  geometry_msgs::msg::PoseStamped end_pose;
+
+  // 设置目标位置和姿态
+  end_pose.header.frame_id = "base_link";
+  end_pose.pose.position.x = 0.6;
+  end_pose.pose.position.y = 0.5;
+  end_pose.pose.position.z = 1.0;
+  end_pose.pose.orientation.w = 1.0;
+
+  // 插值步数
+  int interpolation_steps = 40;
+
+  // 生成插值后的位姿序列
+  std::vector<geometry_msgs::msg::PoseStamped> interpolated_poses = interpolatePose(start_pose, end_pose, interpolation_steps);
+
+ // 输出所有插值后的位姿序列
+  for (size_t i = 0; i < interpolated_poses.size(); ++i) {
+      const auto& pose = interpolated_poses[i];
+      RCLCPP_INFO(
+          LOGGER,
+          "Pose %zu:\n  Position - x: %.4f, y: %.4f, z: %.4f\n  Orientation - x: %.4f, y: %.4f, z: %.4f, w: %.4f",
+          i + 1,
+          pose.pose.position.x,
+          pose.pose.position.y,
+          pose.pose.position.z,
+          pose.pose.orientation.x,
+          pose.pose.orientation.y,
+          pose.pose.orientation.z,
+          pose.pose.orientation.w
+      );
+  }
+
+  // 循环插值的位姿，将中间姿态逐步加入规划请求中
+  for (const auto &interp_pose : interpolated_poses)
+  {
+      planning_interface::MotionPlanRequest req;
+      planning_interface::MotionPlanResponse res;
+
+      // 创建一个新的姿态目标
+      moveit_msgs::msg::Constraints pose_goal = kinematic_constraints::constructGoalConstraints(
+          "finger_center", interp_pose, tolerance_pose, tolerance_angle);
+
+      req.group_name = PLANNING_GROUP;
+      req.goal_constraints.push_back(pose_goal);
+
+      planning_interface::PlanningContextPtr context = planner_instance->getPlanningContext(planning_scene, req, res.error_code_);
+      context->solve(res);
+
+      if (res.error_code_.val != res.error_code_.SUCCESS)
+      {
+          RCLCPP_ERROR(LOGGER, "Could not compute plan successfully for interpolated pose.");
+          continue;
+      }
+
+      // 获取并可视化规划的路径
+      moveit_msgs::msg::MotionPlanResponse response;
+      res.getMessage(response);
+      display_trajectory.trajectory.push_back(response.trajectory);
+      visual_tools.publishTrajectoryLine(display_trajectory.trajectory.back(), joint_model_group);
+      visual_tools.trigger();
+      display_publisher->publish(display_trajectory);
+
+      visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to proceed to the next interpolated pose");
+  }
+
+
+
+
+
+
+
+
 
   // We will create the request as a constraint using a helper function available
   // from the
-  // :moveit_codedir:`kinematic_constraints<moveit_core/kinematic_constraints/include/moveit/kinematic_constraints/kinematic_constraint.h>`
+  // :moveit_codedir:kinematic_constraints<moveit_core/kinematic_constraints/include/moveit/kinematic_constraints/kinematic_constraint.h>
   // package.
   moveit_msgs::msg::Constraints pose_goal =
       kinematic_constraints::constructGoalConstraints("finger_center", pose, tolerance_pose, tolerance_angle);
@@ -199,10 +325,10 @@ int main(int argc, char** argv)
 
   // Visualize the result
   // ^^^^^^^^^^^^^^^^^^^^
-  std::shared_ptr<rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>> display_publisher =
-      motion_planning_api_tutorial_node->create_publisher<moveit_msgs::msg::DisplayTrajectory>("/display_planned_path",
-                                                                                               1);
-  moveit_msgs::msg::DisplayTrajectory display_trajectory;
+  // std::shared_ptr<rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>> display_publisher =
+  //     motion_planning_api_tutorial_node->create_publisher<moveit_msgs::msg::DisplayTrajectory>("/display_planned_path",
+  //                                                                                              1);
+  // moveit_msgs::msg::DisplayTrajectory display_trajectory;
 
   /* Visualize the trajectory */
   moveit_msgs::msg::MotionPlanResponse response;
