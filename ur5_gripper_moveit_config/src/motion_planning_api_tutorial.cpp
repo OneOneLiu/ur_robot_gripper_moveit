@@ -228,20 +228,12 @@ int main(int argc, char** argv)
 
   // 获取机器人当前的位姿，作为起始位姿 start_pose
   geometry_msgs::msg::PoseStamped start_pose = move_group.getCurrentPose();
-  geometry_msgs::msg::PoseStamped end_pose;
-
-  // 设置目标位置和姿态
-  end_pose.header.frame_id = "base_link";
-  end_pose.pose.position.x = 0.6;
-  end_pose.pose.position.y = 0.5;
-  end_pose.pose.position.z = 1.0;
-  end_pose.pose.orientation.w = 1.0;
 
   // 插值步数
-  int interpolation_steps = 40;
+  int interpolation_steps = 5;
 
   // 生成插值后的位姿序列
-  std::vector<geometry_msgs::msg::PoseStamped> interpolated_poses = interpolatePose(start_pose, end_pose, interpolation_steps);
+  std::vector<geometry_msgs::msg::PoseStamped> interpolated_poses = interpolatePose(start_pose, pose, interpolation_steps);
 
  // 输出所有插值后的位姿序列
   for (size_t i = 0; i < interpolated_poses.size(); ++i) {
