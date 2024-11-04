@@ -213,7 +213,7 @@ int main(int argc, char** argv)
   // Let's specify a path constraint and a pose goal for our group.
   // First define the path constraint.
   moveit_msgs::msg::OrientationConstraint ocm;
-  ocm.link_name = "wrist_3_link";
+  ocm.link_name = "finger_center";
   ocm.header.frame_id = "base_link";
   ocm.orientation.w = 1.0;
   ocm.absolute_x_axis_tolerance = 0.1;
@@ -249,7 +249,7 @@ int main(int argc, char** argv)
   moveit::core::RobotState start_state(*move_group.getCurrentState());
   geometry_msgs::msg::Pose start_pose2;
   start_pose2.orientation.w = 1.0;
-  start_pose2.position.x = 0.30;
+  start_pose2.position.x = 0.50;
   start_pose2.position.y = 0.2;
   start_pose2.position.z = 0.5;
   start_state.setFromIK(joint_model_group, start_pose2);
@@ -261,7 +261,7 @@ int main(int argc, char** argv)
 
   // Planning with constraints can be slow because every sample must call an inverse kinematics solver.
   // Let's increase the planning time from the default 5 seconds to be sure the planner has enough time to succeed.
-  move_group.setPlanningTime(10.0);
+  move_group.setPlanningTime(100.0);
 
   success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
   RCLCPP_INFO(LOGGER, "Visualizing plan 3 (constraints) %s", success ? "" : "FAILED");
