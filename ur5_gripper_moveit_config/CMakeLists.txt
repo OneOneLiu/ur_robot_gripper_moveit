@@ -68,6 +68,17 @@ ament_target_dependencies(move_group_interface_tutorial
 install(TARGETS move_group_interface_tutorial
   DESTINATION lib/${PROJECT_NAME}
 )
+
+add_executable(move_group_add_mesh
+    src/move_group_add_mesh.cpp)
+target_include_directories(move_group_add_mesh
+    PUBLIC include)
+ament_target_dependencies(move_group_add_mesh
+    ${THIS_PACKAGE_INCLUDE_DEPENDS} Boost)
+
+install(TARGETS move_group_add_mesh
+  DESTINATION lib/${PROJECT_NAME}
+)
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
