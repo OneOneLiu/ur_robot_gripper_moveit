@@ -1,5 +1,6 @@
 #include <rclcpp/rclcpp.hpp>
-
+#include <geometric_shapes/shapes.h>
+#include <geometric_shapes/shape_operations.h>
 // MoveIt
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
@@ -60,6 +61,36 @@ int main(int argc, char** argv)
   std::vector<moveit_msgs::msg::CollisionObject> collision_objects = {box};
   planning_scene_interface.addCollisionObjects(collision_objects);
 
+  // Define the frame mesh as a collision object
+  moveit_msgs::msg::CollisionObject frame_mesh;
+  frame_mesh.header.frame_id = move_group.getPlanningFrame();
+  frame_mesh.id = "frame_mesh";
+
+  // Load the mesh from the specified path
+  shapes::Mesh* mesh = shapes::createMeshFromResource("file:///catkin_ws/src/ur5_robot_gripper/meshes/frame/collision/frame.stl");
+  shape_msgs::msg::Mesh frame_mesh_msg;
+  shapes::ShapeMsg mesh_shape_msg;
+  shapes::constructMsgFromShape(mesh, mesh_shape_msg);
+  frame_mesh_msg = boost::get<shape_msgs::msg::Mesh>(mesh_shape_msg);
+
+  //  Delete the dynamically allocated mesh to avoid memory leaks
+  delete mesh;
+  // Set the frame pose and other properties
+
+  geometry_msgs::msg::Pose frame_mesh_pose;
+  frame_mesh_pose.orientation.w = 1.0;  // Adjust the pose if needed
+  frame_mesh_pose.position.x = 0.0;
+  frame_mesh_pose.position.y = 0.0;
+  frame_mesh_pose.position.z = 0.0;
+
+  frame_mesh.meshes.push_back(frame_mesh_msg);
+  frame_mesh.mesh_poses.push_back(frame_mesh_pose);
+  frame_mesh.operation = frame_mesh.ADD;
+
+  // Add the mesh to the planning scene
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to add the mesh to the scene");
+  planning_scene_interface.applyCollisionObject(frame_mesh);
+
   // Define a cylinder collision object to attach
   moveit_msgs::msg::CollisionObject cylinder;
   cylinder.id = "cylinder1";
@@ -90,17 +121,47 @@ int main(int argc, char** argv)
   std::vector<std::string> touch_links = {"robotiq_85_right_finger_tip_link", "robotiq_85_left_finger_tip_link"};
   move_group.attachObject(cylinder.id, move_group.getEndEffectorLink(), touch_links);
 
-  // visual_tools.publishText(Eigen::Isometry3d::Identity(), "Cylinder Attached to Robot", rvt::WHITE, rvt::XLARGE);
+  std::vector<std::string> touch_links_frame = {"base_link"};
+  move_group.attachObject(frame_mesh.id, move_group.getPlanningFrame(), touch_links_frame);
+
+  visual_tools.publishText(Eigen::Isometry3d::Identity(), "Cylinder Attached to Robot", rvt::WHITE, rvt::XLARGE);
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to detach the cylinder");
 
   RCLCPP_INFO(LOGGER, "Detach the object from the robot"); move_group.detachObject(cylinder.id);
-
+  // RCLCPP_INFO(LOGGER, "Detach the frame from the robot"); move_group.detachObject(frame_mesh.id);
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to remove the objects");
+
+  std::map<std::string, moveit_msgs::msg::CollisionObject> collision_objects1 = planning_scene_interface.getObjects();
+
+  // 打印当前场景中的碰撞对象的 ID
+  RCLCPP_INFO(LOGGER, "Current collision objects in the scene:");
+  for (const auto& kv : collision_objects1)
+  {
+      RCLCPP_INFO(LOGGER, " - %s", kv.first.c_str());
+  }
   std::vector<std::string> object_ids;
   object_ids.push_back(box.id);
   object_ids.push_back(cylinder.id);
+  object_ids.push_back(frame_mesh.id);
   planning_scene_interface.removeCollisionObjects(object_ids);
+  
+   std::map<std::string, moveit_msgs::msg::CollisionObject> collision_objects2 = planning_scene_interface.getObjects();
 
+  std::vector<std::string> object_ids1;
+  object_ids1.push_back(box.id);
+  object_ids1.push_back(cylinder.id);
+  object_ids1.push_back(frame_mesh.id);
+  planning_scene_interface.removeCollisionObjects(object_ids1);
+  // 打印当前场景中的碰撞对象的 ID
+  RCLCPP_INFO(LOGGER, "Current collision objects in the scene:");
+  for (const auto& kv : collision_objects2)
+  {
+      RCLCPP_INFO(LOGGER, " - %s", kv.first.c_str());
+  }
+
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to remove the objects");
+  std::vector<std::string> object_ids2 = planning_scene_interface.getKnownObjectNames();
+  planning_scene_interface.removeCollisionObjects(object_ids2);
   // Wait for confirmation that objects are removed
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to confirm objects are removed");
 
