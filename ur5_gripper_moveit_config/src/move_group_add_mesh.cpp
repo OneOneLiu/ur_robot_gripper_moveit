@@ -191,7 +191,7 @@ int main(int argc, char** argv)
   std::vector<std::string> touch_links_frame = {"shoulder_link", "base_link"};
   move_group.attachObject(frame_mesh.id, move_group.getPlanningFrame(), touch_links_frame);
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to attach the realsense to the robot");
-  std::vector<std::string> touch_links_realsense = {"wrists_3_link", "robotiq_85_base_link"};
+  std::vector<std::string> touch_links_realsense = {"wrist_3_link", "robotiq_85_base_link"};
   move_group.attachObject(realsense_mesh.id, move_group.getEndEffectorLink(), touch_links_realsense);
 
   visual_tools.publishText(Eigen::Isometry3d::Identity(), "Cylinder Attached to Robot", rvt::WHITE, rvt::XLARGE);
