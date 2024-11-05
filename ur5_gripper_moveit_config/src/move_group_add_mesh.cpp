@@ -124,6 +124,39 @@ int main(int argc, char** argv)
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to add the mesh to the scene");
   planning_scene_interface.applyCollisionObject(realsense_mesh);
 
+  // Define the tray mesh as a collision object
+  moveit_msgs::msg::CollisionObject tray_mesh;
+  tray_mesh.header.frame_id = move_group.getPlanningFrame();
+  tray_mesh.id = "tray_mesh";
+
+  // Load the mesh from the specified path
+  shapes::Mesh* tray_tem_mesh = shapes::createMeshFromResource("file:///catkin_ws/src/ur5_robot_gripper/meshes/tray/collision/grasping_tray.stl");
+  shape_msgs::msg::Mesh tray_mesh_msg;
+  shapes::ShapeMsg tray_mesh_shape_msg;
+  shapes::constructMsgFromShape(tray_tem_mesh, tray_mesh_shape_msg);
+  tray_mesh_msg = boost::get<shape_msgs::msg::Mesh>(tray_mesh_shape_msg);
+
+  //  Delete the dynamically allocated mesh to avoid memory leaks
+  delete tray_tem_mesh;
+  // Set the frame pose and other properties
+
+  geometry_msgs::msg::Pose tray_mesh_pose;
+  tray_mesh_pose.orientation.w = 0.7071;
+  tray_mesh_pose.orientation.x = 0.0;
+  tray_mesh_pose.orientation.y = 0.0;
+  tray_mesh_pose.orientation.z = 0.7071;
+  tray_mesh_pose.position.x = 0.0;
+  tray_mesh_pose.position.y = -0.54;
+  tray_mesh_pose.position.z = 0.0;
+
+  tray_mesh.meshes.push_back(tray_mesh_msg);
+  tray_mesh.mesh_poses.push_back(tray_mesh_pose);
+  tray_mesh.operation = tray_mesh.ADD;
+
+  // Add the mesh to the planning scene
+  visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to add the mesh to the scene");
+  planning_scene_interface.applyCollisionObject(tray_mesh);
+
   // Define a cylinder collision object to attach
   moveit_msgs::msg::CollisionObject cylinder;
   cylinder.id = "cylinder1";
@@ -163,7 +196,6 @@ int main(int argc, char** argv)
 
   visual_tools.publishText(Eigen::Isometry3d::Identity(), "Cylinder Attached to Robot", rvt::WHITE, rvt::XLARGE);
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to detach the cylinder");
-
   RCLCPP_INFO(LOGGER, "Detach the object from the robot"); move_group.detachObject(cylinder.id);
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to detach the frame");
   RCLCPP_INFO(LOGGER, "Detach the frame from the robot"); move_group.detachObject(frame_mesh.id);
