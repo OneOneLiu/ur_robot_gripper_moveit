@@ -10,6 +10,7 @@ def generate_launch_description():
     moveit_config = (
         MoveItConfigsBuilder("ur5_gripper")
         .robot_description(file_path="config/ur5_with_robotiq_2f_85.urdf.xacro")
+        .robot_description_semantic(file_path="config/ur5_with_robotiq_2f_85.srdf")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
         .to_moveit_configs()
     )
