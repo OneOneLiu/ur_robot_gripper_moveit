@@ -141,7 +141,7 @@ planner_configs:
     max_failures: 5000  # maximum consecutive failure limit. default: 5000
 
 manipulator:
-  default_planner_config: PRMstar
+  default_planner_config: PRM
   planner_configs:
     - AnytimePathShortening
     - SBL
