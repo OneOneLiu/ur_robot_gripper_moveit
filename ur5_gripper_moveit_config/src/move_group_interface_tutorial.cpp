@@ -50,6 +50,45 @@
 // and inside the namespace with the narrowest scope (if there is one)
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("move_group_demo");
 
+void printPlanTrajectory(const moveit::planning_interface::MoveGroupInterface::Plan& plan)
+{
+    const auto& trajectory = plan.trajectory_;
+
+    // 打印时间步
+    for (size_t i = 0; i < trajectory.joint_trajectory.points.size(); ++i)
+    {
+        const auto& point = trajectory.joint_trajectory.points[i];
+        std::cout << "Time from start: " << point.time_from_start.sec << " s" << std::endl;
+
+        // 打印关节位置
+        std::cout << "Joint positions: ";
+        for (const auto& position : point.positions)
+        {
+            std::cout << position << " ";
+        }
+        std::cout << std::endl;
+
+        // 打印关节速度
+        std::cout << "Joint velocities: ";
+        for (const auto& velocity : point.velocities)
+        {
+            std::cout << velocity << " ";
+        }
+        std::cout << std::endl;
+
+        // 打印关节加速度（如果可用）
+        if (!point.accelerations.empty())
+        {
+            std::cout << "Joint accelerations: ";
+            for (const auto& acceleration : point.accelerations)
+            {
+                std::cout << acceleration << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+}
+
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
@@ -145,6 +184,9 @@ int main(int argc, char** argv)
 
   bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
 
+  std::cout << "Plan generated successfully!" << std::endl;
+  printPlanTrajectory(my_plan);
+
   RCLCPP_INFO(LOGGER, "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
 
   // Visualizing plans
@@ -197,6 +239,8 @@ int main(int argc, char** argv)
   move_group.setMaxAccelerationScalingFactor(0.05);
 
   success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  std::cout << "Plan generated successfully!" << std::endl;
+  printPlanTrajectory(my_plan);
   RCLCPP_INFO(LOGGER, "Visualizing plan 2 (joint space goal) %s", success ? "" : "FAILED");
 
   // Visualize the plan in RViz:
@@ -264,6 +308,8 @@ int main(int argc, char** argv)
   move_group.setPlanningTime(10.0);
 
   success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  std::cout << "Plan generated successfully!" << std::endl;
+  printPlanTrajectory(my_plan);
   RCLCPP_INFO(LOGGER, "Visualizing plan 3 (constraints) %s", success ? "" : "FAILED");
 
   // Visualize the plan in RViz:
@@ -342,6 +388,8 @@ int main(int argc, char** argv)
   move_group.setPoseTarget(another_pose);
 
   success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  std::cout << "Plan generated successfully!" << std::endl;
+  printPlanTrajectory(my_plan);
   RCLCPP_INFO(LOGGER, "Visualizing plan 5 (with no obstacles) %s", success ? "" : "FAILED");
 
   visual_tools.deleteAllMarkers();
@@ -397,6 +445,8 @@ int main(int argc, char** argv)
 
   // Now, when we plan a trajectory it will avoid the obstacle.
   success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  std::cout << "Plan generated successfully!" << std::endl;
+  printPlanTrajectory(my_plan);
   RCLCPP_INFO(LOGGER, "Visualizing plan 6 (pose goal move around cuboid) %s", success ? "" : "FAILED");
   visual_tools.publishText(text_pose, "Obstacle_Goal", rvt::WHITE, rvt::XLARGE);
   visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
