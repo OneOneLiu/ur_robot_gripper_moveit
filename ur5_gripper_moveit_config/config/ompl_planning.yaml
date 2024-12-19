@@ -142,6 +142,8 @@ planner_configs:
 
 manipulator:
   default_planner_config: PRM
+  enforce_constrained_state_space: true
+  projection_evaluator: joints(shoulder_pan_joint, shoulder_lift_joint)
   planner_configs:
     - AnytimePathShortening
     - SBL
